@@ -57,7 +57,7 @@ num_nights = 10
 for i in range(len(start_url)):
 	try:
 		session = HTMLSession()
-		r = session.get(f"https://secure.chevalresidences.com/portal/site/www.chevalresidences.com/en/results.php?checkin={start_url[i]}&nights={num_nights}&keyword=CHC")
+		r = session.get("https://secure.chevalresidences.com/portal/site/www.chevalresidences.com/en/results.php?checkin={start}&nights={num}&keyword=CHC".format(start=start_url[i], num=num_nights))
 		r.html.render()
 
 		print("Date " + start_url[i])
