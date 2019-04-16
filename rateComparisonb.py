@@ -1,4 +1,5 @@
 import time
+import sys
 from datetime import datetime, timedelta
 from requests_html import HTMLSession
 
@@ -34,6 +35,10 @@ while True:
 		print(e)
 
 
+print("processing,,,\n")
+
+
+
 #Storing formatted date string in a list. Date requests will be every 10 days and lenght of stay is 5 
 start_url=[]
 for i in range(365):
@@ -48,34 +53,41 @@ for i in range(365):
 
 #Time to go out and get those datas
 
-num_nights = 5
+num_nights = 10
 for i in range(len(start_url)):
-	session = HTMLSession()
-	r = session.get(f"https://secure.chevalresidences.com/portal/site/www.chevalresidences.com/en/results.php?checkin={start_url[i]}&nights={num_nights}&keyword=CHC")
-	r.html.render()
 	try:
-		price1bed = r.html.find("span[id*='mbprice_'][id$='15070']", first=True).text
-		price2bed = r.html.find("span[id*='mbprice_'][id$='15071']", first=True).text
-		price1bed_exvat=price1bed.replace(",","")
-		price2bed_exvat=price2bed.replace(",","")
-		nprice1bed=(float(price1bed_exvat))/1.2
-		nprice2bed=(float(price2bed_exvat))/1.2
-		nprice1bed=nprice1bed/num_nights
-		nprice2bed=nprice2bed/num_nights
+		session = HTMLSession()
+		r = session.get(f"https://secure.chevalresidences.com/portal/site/www.chevalresidences.com/en/results.php?checkin={start_url[i]}&nights={num_nights}&keyword=CHC")
+		r.html.render()
+
 		print("Date " + start_url[i])
-		print("Superior One Bedroom " + "£ "+ str(nprice1bed))
-		print("2 Bedroom Apartment " + "£ "+ str(nprice2bed))
+		try:
+			price1bed = r.html.find("span[id*='mbprice_'][id$='15070']", first=True).text
+		except:
+			print("No availability - Superior One Bedroom")
+		else:
+			price1bed_exvat=price1bed.replace(",","")
+			nprice1bed=(float(price1bed_exvat))/1.2
+			nprice1bed=round(nprice1bed/num_nights)
+			print("Superior One Bedroom " + "£ "+ str(nprice1bed))
+
+		try:
+			price2bed = r.html.find("span[id*='mbprice_'][id$='15071']", first=True).text
+		except:
+			print("No availability - 2 Bedroom Apartment")
+		else:
+			price2bed_exvat=price2bed.replace(",","")
+			nprice2bed=(float(price2bed_exvat))/1.2
+			nprice2bed=round(nprice2bed/num_nights)	
+			print("2 Bedroom Apartment " + "£ "+ str(nprice2bed))
+		
 		print("")
-		try:
-			for i in range(70):
-				time.sleep(1)
-		except KeyboardInterrupt:
-			print("exit")
-	except Exception as e:
-		print(e)
-		try:
-			for i in range(70):
-				time.sleep(1)
-		except KeyboardInterrupt:
-			print("exit")
+		time.sleep(70)
+
+	except KeyboardInterrupt:
+				print("exit")
+				sys.exit()
+		
+			
 	
+		
