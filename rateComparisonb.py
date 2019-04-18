@@ -1,5 +1,6 @@
 import time
 import sys
+import openpyxl
 from datetime import datetime, timedelta
 from requests_html import HTMLSession
 
@@ -51,9 +52,19 @@ for i in range(365):
 		start_date = start_date + days
 
 
-#Time to go out and get those datas
+#Time to go out and get those datas and save to a csv file
+
+#setup excel
+wb = openpyxl.load_workbook('cheval.xlsx')
+sheet = wb.active
+sheet.cell(row=1, column=3).value = "DATE"
+sheet.cell(row=1, column=4).value = "SUPERIOR 1 BED"
+sheet.cell(row=1, column=5).value = "TWO BEDROOM"
+thelast=sheet.max_row
+
 
 num_nights = 10
+
 for i in range(len(start_url)):
 	try:
 		session = HTMLSession()
@@ -61,6 +72,8 @@ for i in range(len(start_url)):
 		r.html.render()
 
 		print("Date " + start_url[i])
+		sheet.cell(row=thelast+1+i, column=3).value = start_url[i]
+
 		try:
 			price1bed = r.html.find("span[id*='mbprice_'][id$='15070']", first=True).text
 		except:
@@ -70,6 +83,7 @@ for i in range(len(start_url)):
 			nprice1bed=(float(price1bed_exvat))/1.2
 			nprice1bed=round(nprice1bed/num_nights)
 			print("Superior One Bedroom " + "£ "+ str(nprice1bed))
+			sheet.cell(row=thelast+1+i, column=4).value = nprice1bed
 
 		try:
 			price2bed = r.html.find("span[id*='mbprice_'][id$='15071']", first=True).text
@@ -80,6 +94,8 @@ for i in range(len(start_url)):
 			nprice2bed=(float(price2bed_exvat))/1.2
 			nprice2bed=round(nprice2bed/num_nights)	
 			print("2 Bedroom Apartment " + "£ "+ str(nprice2bed))
+			sheet.cell(row=thelast+1+i, column=5).value = nprice2bed
+			
 		
 		print("")
 		time.sleep(70)
@@ -87,7 +103,5 @@ for i in range(len(start_url)):
 	except KeyboardInterrupt:
 				print("exit")
 				sys.exit()
-		
-			
-	
-		
+
+wb.save('cheval.xlsx')
