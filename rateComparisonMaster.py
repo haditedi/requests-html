@@ -1,26 +1,25 @@
 import time
 import sys
+import openpyxl
 from datetime import datetime, timedelta
 from requests_html import HTMLSession
 
 
-
-todayDate = datetime.now()
-
 #getting and validating input for start date and end date (should not exceed 1 year)
+max_date = timedelta(days=366)
+todayDate = datetime.now()
 while True:
 	print("Please enter the start date (dd-mm-yy): ")
 	inStartDate = input()
 	try:
 		start_date = datetime.strptime(inStartDate[:2]+'-'+inStartDate[3:5]+'-'+inStartDate[6:8], '%d-%m-%y')
-		if start_date > todayDate:
+		if start_date > todayDate and start_date < (todayDate+max_date):
 			break
 		else:
-			print("date should be at least tommorrow")
+			print("date should be at least tommorrow and not exceed 1 year")
 	except Exception as e:
 		print(e)
 while True:
-	max_date = timedelta(days=366)
 	print("Please enter end date (dd-mm-yy): ")
 	inEndDate = input()
 	try:
@@ -39,10 +38,10 @@ print("processing,,,\n")
 
 
 
-#Storing formatted date string in a list. Date requests will be every 10 days and lenght of stay is 5 
+#Storing formatted date string in a list. Date requests will be every 3 days and length of stay is 10 nights 
 start_url=[]
 for i in range(365):
-	days = timedelta(days=10)
+	days = timedelta(days=3)
 	if start_date >= end_Date_User:
 		start_url.append(end_Date_User.strftime("%Y-%m-%d"))
 		break
@@ -51,16 +50,28 @@ for i in range(365):
 		start_date = start_date + days
 
 
-#Time to go out and get those datas
+#Time to go out and get those datas and save to an excel file
 
-num_nights = 10
+#setup excel
+wb = openpyxl.load_workbook('cheval.xlsx')
+sheet = wb.active
+sheet.cell(row=1, column=3).value = "DATE"
+sheet.cell(row=1, column=4).value = "CHC-SUPERIOR 1 BED"
+sheet.cell(row=1, column=5).value = "CHC-TWO BEDROOM"
+thelast=sheet.max_row
+
+
+num_nights = 10 
+
 for i in range(len(start_url)):
 	try:
 		session = HTMLSession()
-		r = session.get(f"https://secure.chevalresidences.com/portal/site/www.chevalresidences.com/en/results.php?checkin={start_url[i]}&nights={num_nights}&keyword=CHC")
+		r = session.get("https://secure.chevalresidences.com/portal/site/www.chevalresidences.com/en/results.php?checkin={start}&nights={num}&keyword=CHC".format(start=start_url[i], num=num_nights))
 		r.html.render()
 
 		print("Date " + start_url[i])
+		sheet.cell(row=thelast+1+i, column=3).value = start_url[i]
+
 		try:
 			price1bed = r.html.find("span[id*='mbprice_'][id$='15070']", first=True).text
 		except:
@@ -70,6 +81,7 @@ for i in range(len(start_url)):
 			nprice1bed=(float(price1bed_exvat))/1.2
 			nprice1bed=round(nprice1bed/num_nights)
 			print("Superior One Bedroom " + "£ "+ str(nprice1bed))
+			sheet.cell(row=thelast+1+i, column=4).value = nprice1bed
 
 		try:
 			price2bed = r.html.find("span[id*='mbprice_'][id$='15071']", first=True).text
@@ -80,14 +92,16 @@ for i in range(len(start_url)):
 			nprice2bed=(float(price2bed_exvat))/1.2
 			nprice2bed=round(nprice2bed/num_nights)	
 			print("2 Bedroom Apartment " + "£ "+ str(nprice2bed))
+			sheet.cell(row=thelast+1+i, column=5).value = nprice2bed
+			
 		
 		print("")
 		time.sleep(70)
 
 	except KeyboardInterrupt:
-				print("exit")
-				sys.exit()
-		
-			
-	
-		
+		print("exit")
+		sys.exit()
+	except Exception as e:
+		print(e)
+
+wb.save('cheval.xlsx')
