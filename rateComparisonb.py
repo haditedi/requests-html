@@ -32,10 +32,8 @@ while True:
 			break
 	except Exception as e:
 		print(e)
-
-
 print("processing,,,\n")
-
+#-----------------------
 
 
 #Storing formatted date string in a list. Date requests will be every 3 days and length of stay is 10 nights 
@@ -51,15 +49,12 @@ for i in range(365):
 
 
 #Time to go out and get those datas and save to an excel file
-
-#setup excel
 wb = openpyxl.load_workbook('cheval.xlsx')
 sheet = wb.active
 sheet.cell(row=1, column=3).value = "DATE"
 sheet.cell(row=1, column=4).value = "CHC-SUPERIOR 1 BED"
 sheet.cell(row=1, column=5).value = "CHC-TWO BEDROOM"
 thelast=sheet.max_row
-
 
 num_nights = 10 
 
@@ -105,3 +100,4 @@ for i in range(len(start_url)):
 		print(e)
 
 wb.save('cheval.xlsx')
+
