@@ -4,16 +4,17 @@ import openpyxl
 from datetime import datetime, timedelta
 from requests_html import HTMLSession
 
+# A program to fetch rate from a serviced apartments provider and is applicable for hotel as well
 
-#getting and validating input for start date and end date (should not exceed 1 year)
-max_date = timedelta(days=366)
+# Getting and validating input for start date and end date (should not exceed 1 year)
+maxDate = timedelta(days=366)
 todayDate = datetime.now()
 while True:
 	print("Please enter the start date (dd-mm-yy): ")
 	inStartDate = input()
 	try:
 		start_date = datetime.strptime(inStartDate[:2]+'-'+inStartDate[3:5]+'-'+inStartDate[6:8], '%d-%m-%y')
-		if start_date > todayDate and start_date < (todayDate+max_date):
+		if start_date > todayDate and start_date < (todayDate+maxDate):
 			break
 		else:
 			print("date should be at least tommorrow and not exceed 1 year")
@@ -26,17 +27,17 @@ while True:
 		end_Date_User = datetime.strptime(inEndDate[:2]+'-'+inEndDate[3:5]+'-'+inEndDate[6:8], '%d-%m-%y')
 		if end_Date_User < start_date:
 			print("End date should be greater than start date")
-		elif end_Date_User > (start_date+max_date):
+		elif end_Date_User > (start_date+maxDate):
 			print("End date should not be more than a year")
 		else:
 			break
 	except Exception as e:
 		print(e)
 print("processing,,,\n")
-#-----------------------
+# -----------------------
 
 
-#Storing formatted date string in a list. Date requests will be every 3 days and length of stay is 10 nights 
+# Storing formatted date string in a list. Date requests will be every 3 days and length of stay is 10 nights 
 start_url=[]
 for i in range(365):
 	days = timedelta(days=3)
@@ -46,18 +47,22 @@ for i in range(365):
 	else:
 		start_url.append(start_date.strftime("%Y-%m-%d"))
 		start_date = start_date + days
+num_nights = 10 
 
+# Setting up excel sheets
+destFilename = 'rateCompare.xlsx'
+try:
+	wb = openpyxl.load_workbook(filename=destFilename)
+except Exception as e:
+	wb = openpyxl.Workbook()
 
-#Time to go out and get those datas and save to an excel file
-wb = openpyxl.load_workbook('cheval.xlsx')
 sheet = wb.active
 sheet.cell(row=1, column=3).value = "DATE"
 sheet.cell(row=1, column=4).value = "CHC-SUPERIOR 1 BED"
 sheet.cell(row=1, column=5).value = "CHC-TWO BEDROOM"
 thelast=sheet.max_row
 
-num_nights = 10 
-
+# Going out to fetch the data as inputted earlier and pasting the data in Excel file
 for i in range(len(start_url)):
 	try:
 		session = HTMLSession()
@@ -88,16 +93,7 @@ for i in range(len(start_url)):
 			nprice2bed=round(nprice2bed/num_nights)	
 			print("2 Bedroom Apartment " + "£ "+ str(nprice2bed))
 			sheet.cell(row=thelast+1+i, column=5).value = nprice2bed
-			
-		
-		print("")
 		time.sleep(70)
-
-	except KeyboardInterrupt:
-		print("exit")
-		sys.exit()
 	except Exception as e:
 		print(e)
-
-wb.save('cheval.xlsx')
-
+wb.save(filename=destFilename)

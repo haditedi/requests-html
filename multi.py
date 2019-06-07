@@ -4,8 +4,6 @@ import sys
 import openpyxl
 from datetime import datetime, timedelta
 from requests_html import AsyncHTMLSession
-import matplotlib.pyplot as plt
-
 
 #getting and validating input for start date and end date (should not exceed 1 year)
 max_date = timedelta(days=366)
@@ -73,7 +71,7 @@ chcnum_nights = 10
 #-------------
 
 
-#Time to go out and get those datas and save to an excel file
+#Set up variables for the excel file
 wb = openpyxl.load_workbook('cheval.xlsx')
 sheet = wb.active
 sheet.cell(row=1, column=3).value = "DATE"
@@ -86,6 +84,7 @@ thelast=sheet.max_row
 
 chcdate, chc1bed_list, chc2bed_list = [],[],[]
 
+#Requesting data from Cheval Harrington Court and Ashburn Court
 for i in range(len(ascstart_url)):
 	ascdate=ascstart_url[i]
 	ascdep_date = ascdep_url[i]	
@@ -111,12 +110,12 @@ for i in range(len(ascstart_url)):
 	print("Date " + ascstart_url[i])
 	sheet.cell(row=thelast+1+i, column=3).value = ascstart_url[i]
 	chcdate.append(ascstart_url[i])
-	#arranging datas returned from Cheval
+
+	#Storing requested datas
 	try:
 		chc1bed = results[1].html.find("span[id*='mbprice_'][id$='15070']", first=True).text
 	except:
-		print("No availability - Superior One Bedroom")
-		chc1bed_list.append(nprice1bed)
+		print("No availability -CHC- Superior One Bedroom")
 	else:
 		price1bed_exvat=chc1bed.replace(",","")
 		nprice1bed=(float(price1bed_exvat))/1.2
@@ -124,11 +123,10 @@ for i in range(len(ascstart_url)):
 		print("Superior One Bedroom " + "£ "+ str(nprice1bed))
 		sheet.cell(row=thelast+1+i, column=4).value = nprice1bed
 		chc1bed_list.append(nprice1bed)
-
 	try:
 		chc2bed = results[1].html.find("span[id*='mbprice_'][id$='15071']", first=True).text
 	except:
-		print("No availability - 2 Bedroom Apartment")
+		print("No availability -CHC- 2 Bedroom Apartment")
 	else:
 		price2bed_exvat=chc2bed.replace(",","")
 		nprice2bed=(float(price2bed_exvat))/1.2
@@ -140,27 +138,25 @@ for i in range(len(ascstart_url)):
 	try:
 		asc1bed = results[0].html.find("div.ProductsList div[class*='HeaderPrice'] span[id*='V151_C1_AR_ctl03']", first=True).text
 	except:
-		print("No availability - Deluxe 1 Bed")
+		print("No availability -ASC- Deluxe 1 Bed")
 	else:
 		print(asc1bed)
+	try:
+		asc2bed = results[0].html.find("div.ProductsList div[class*='HeaderPrice'] span[id*='V151_C1_AR_ctl00']", first=True).text
+	except:
+		print("No availability -ASC- Deluxe 2 Bed")
+	else:
+		print(asc2bed)
+	try:
+		asc1bed = results[0].html.find("div.ProductsList div[class*='HeaderPrice'] span[id*='V151_C1_AR_ctl02']", first=True).text
+	except:
+		print("No availability -ASC- Deluxe 3 Bed")
+	else:
+		print(asc3bed)
 
 
 	print("")
 	time.sleep(70)
-
-x = chcdate
-y = chc1bed_list
-
-x2 = chcdate
-y2 = chc2bed_list
-
-plt.plot(x, y, label="1 bed")
-plt.plot(x2, y2, label="2 bed")
-plt.xlabel("Date")
-plt.ylabel("Rate")
-plt.title("Rate for Cheval Harrington")
-plt.legend()
-plt.show()
 
 wb.save('cheval.xlsx')
 
