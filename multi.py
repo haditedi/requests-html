@@ -72,7 +72,7 @@ chcnum_nights = 10
 
 
 #Set up variables for the excel file
-wb = openpyxl.load_workbook('cheval.xlsx')
+wb = openpyxl.load_workbook('multi.xlsx')
 sheet = wb.active
 sheet.cell(row=1, column=3).value = "DATE"
 sheet.cell(row=1, column=4).value = "CHC-1 BED 548ft2"
@@ -81,8 +81,6 @@ sheet.cell(row=1, column=6).value = "ASC-1 BED 624ft2"
 sheet.cell(row=1, column=7).value = "ASC-2 BED 936ft2"
 sheet.cell(row=1, column=8).value = "ASC-3 BED 624ft2"
 thelast=sheet.max_row
-
-chcdate, chc1bed_list, chc2bed_list = [],[],[]
 
 #Requesting data from Cheval Harrington Court and Ashburn Court
 for i in range(len(ascstart_url)):
@@ -109,7 +107,7 @@ for i in range(len(ascstart_url)):
 	
 	print("Date " + ascstart_url[i])
 	sheet.cell(row=thelast+1+i, column=3).value = ascstart_url[i]
-	chcdate.append(ascstart_url[i])
+	
 
 	#Storing requested datas
 	try:
@@ -120,9 +118,9 @@ for i in range(len(ascstart_url)):
 		price1bed_exvat=chc1bed.replace(",","")
 		nprice1bed=(float(price1bed_exvat))/1.2
 		nprice1bed=round(nprice1bed/chcnum_nights)
-		print("Superior One Bedroom " + "£ "+ str(nprice1bed))
+		print("Superior One Bedroom -CHC- " + "£ "+ str(nprice1bed))
 		sheet.cell(row=thelast+1+i, column=4).value = nprice1bed
-		chc1bed_list.append(nprice1bed)
+		
 	try:
 		chc2bed = results[1].html.find("span[id*='mbprice_'][id$='15071']", first=True).text
 	except:
@@ -131,48 +129,48 @@ for i in range(len(ascstart_url)):
 		price2bed_exvat=chc2bed.replace(",","")
 		nprice2bed=(float(price2bed_exvat))/1.2
 		nprice2bed=round(nprice2bed/chcnum_nights)	
-		print("2 Bedroom Apartment " + "£ "+ str(nprice2bed))
+		print("2 Bedroom Apartment -CHC- " + "£ "+ str(nprice2bed))
 		sheet.cell(row=thelast+1+i, column=5).value = nprice2bed
-		chc2bed_list.append(nprice2bed)
+		
 	#arranging datas returned from Ashburn Court
 	try:
-		asc1bed = results[0].html.find("div.ProductsList div[class*='HeaderPrice'] span[id*='V151_C1_AR_ctl03']", first=True).text
+		asc1bed = results[0].html.find("div.ProductsList div[data-room-code='A1F'] span[id*='PriceData']", first=True).text
 	except:
 		print("No availability -ASC- Deluxe 1 Bed")
 	else:
-		print(asc1bed)
+		ascPrice1bed_exvat=asc1bed.replace(",","")
+		ascPrice1bed=(float(ascPrice1bed_exvat))/1.2
+		ascPrice1bed=round(ascPrice1bed)
+		sheet.cell(row=thelast+1+i, column=6).value = ascPrice1bed
+		print("Deluxe 1 bedroom -ASC- £ " + str(ascPrice1bed))
 	try:
-		asc2bed = results[0].html.find("div.ProductsList div[class*='HeaderPrice'] span[id*='V151_C1_AR_ctl00']", first=True).text
+		asc2bed = results[0].html.find("div.ProductsList div[data-room-code='2BD'] span[id*='PriceData']", first=True).text
 	except:
 		print("No availability -ASC- Deluxe 2 Bed")
 	else:
-		print(asc2bed)
+		ascPrice2bed_exvat=asc2bed.replace(",","")
+		ascPrice2bed=(float(ascPrice2bed_exvat))/1.2
+		ascPrice2bed=round(ascPrice2bed)
+		sheet.cell(row=thelast+1+i, column=7).value = ascPrice2bed
+		print("Deluxe 2 bedroom -ASC- £ " + str(ascPrice2bed))
 	try:
-		asc1bed = results[0].html.find("div.ProductsList div[class*='HeaderPrice'] span[id*='V151_C1_AR_ctl02']", first=True).text
+		asc3bed = results[0].html.find("div.ProductsList div[data-room-code='3BD'] span[id*='PriceData']", first=True).text
 	except:
 		print("No availability -ASC- Deluxe 3 Bed")
 	else:
-		print(asc3bed)
+		ascPrice3bed_exvat=asc3bed.replace(",","")
+		ascPrice3bed=(float(ascPrice3bed_exvat))/1.2
+		ascPrice3bed=round(ascPrice3bed)
+		sheet.cell(row=thelast+1+i, column=8).value = ascPrice3bed
+		print("Deluxe 3 bedroom- ASC- £ " + str(ascPrice3bed))
 
 
 	print("")
 	time.sleep(70)
 
-wb.save('cheval.xlsx')
+wb.save('multi.xlsx')
 
 
 
-'''
-	asc1bed=results[0].html.find("div.ProductsList div[class*='HeaderPrice'] span[id*='V151_C1_AR_ctl03']", first=True).text
-	print(asc1bed)
 
-	asc2bed=results[0].html.find("div.ProductsList div[class*='HeaderPrice'] span[id*='V151_C1_AR_ctl01']", first=True).text
-	print(asc2bed)
-
-	asc3bed=results[0].html.find("div.ProductsList div[class*='HeaderPrice'] span[id*='V151_C1_AR_ctl02']", first=True).text
-	print(asc3bed)
-
-	chc1bed = results[1].html.find("span[id*='mbprice_'][id$='15070']", first=True).text
-	print(chc1bed)
-'''
 
