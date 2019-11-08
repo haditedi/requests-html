@@ -1,4 +1,3 @@
-
 import time
 import sys
 import openpyxl
@@ -102,7 +101,7 @@ for i in range(len(ascstart_url)):
 		r = await asession.get(f"https://secure.chevalresidences.com/portal/site/www.chevalresidences.com/en/results.php?checkin= \
 			{chcstart_url[i]}&nights={chcnum_nights}&keyword=CHC")
 		return r
-
+		
 	results = asession.run(getasc, getchc)
 	
 	print("Date " + ascstart_url[i])
