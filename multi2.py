@@ -1,7 +1,5 @@
-#!
 import time
 import sys
-import openpyxl
 from datetime import datetime, timedelta
 from requests_html import AsyncHTMLSession
 
@@ -57,10 +55,9 @@ for i in range(365):
 #------------
 
 #Storing formatted date string in a list. Date requests will be every 3 days and length of stay is 10 nights
-#these are for Cheval Harrington Court and Royal Garden Hotel
+#these are for Cheval Harrington Court 
 chcstart_date =  start_date
 chcstart_url=[]
-
 for i in range(365):
 	if chcstart_date >= end_Date_User:
 		chcstart_url.append(end_Date_User.strftime("%Y-%m-%d"))
@@ -71,16 +68,6 @@ for i in range(365):
 chcnum_nights = 10
 #-------------
 
-#Set up variables for the excel file
-wb = openpyxl.load_workbook('multi.xlsx')
-sheet = wb.active
-sheet.cell(row=1, column=3).value = "DATE"
-sheet.cell(row=1, column=4).value = "CHC-1 BED 548ft2"
-sheet.cell(row=1, column=5).value = "CHC-2 BED 656ft2"
-sheet.cell(row=1, column=6).value = "ASC-1 BED 624ft2"
-sheet.cell(row=1, column=7).value = "ASC-2 BED 936ft2"
-sheet.cell(row=1, column=8).value = "ASC-3 BED 624ft2"
-thelast=sheet.max_row
 
 #Requesting data from Cheval Harrington Court and Ashburn Court
 for i in range(len(ascstart_url)):
@@ -99,25 +86,21 @@ for i in range(len(ascstart_url)):
 		return r
 
 	async def getchc():
-		r = await asession.get(f"https://secure.chevalresidences.com/portal/site/www.chevalresidences.com/en/results.php?checkin= \
-			{chcstart_url[i]}&nights={chcnum_nights}&keyword=CHC")
+		
+		r = await asession.get(f"https://secure.chevalresidences.com/convert/site/ \
+            Cheval%20Harrington%20Court[wsJsZoGCLg62hr_WrMSMy9dIwRklPItcNUhU30wAXMo] \
+            /en/results.php?checkin={chcstart_url[i]}&nights={chcnum_nights}&currency= \
+            GBP&resultViewType=sda&viewtype=rateroom&partya=0")
 		return r
-
-	async def getrgh():
-		r = await asession.get(f"https://be.synxis.com/?_ga=2.196103980.1467259253.1561466651-1232123304.1561466651&adult= \
-			2&arrive={ascdate}&chain=21125&child=0&currency=GBP&depart={ascdep_date}&hotel=3662&level= \
-			hotel&locale=en-GB&rooms=1&sbe_ri=0")
-		return r
-
-	results = asession.run(getasc, getchc, getrgh)
+		
+	results = asession.run(getasc, getchc)
 	
 	print("Date " + ascstart_url[i])
-	sheet.cell(row=thelast+1+i, column=3).value = ascstart_url[i]
-	
+		
 
 	#Storing requested datas
 	try:
-		chc1bed = results[1].html.find("span[id*='mbprice_'][id$='15070']", first=True).text
+		chc1bed = results[1].html.find("span[id='mbprice_6152281_15070_123']", first=True).text
 	except:
 		print("No availability -CHC- Superior One Bedroom")
 	else:
@@ -125,10 +108,9 @@ for i in range(len(ascstart_url)):
 		nprice1bed=(float(price1bed_exvat))/1.2
 		nprice1bed=round(nprice1bed/chcnum_nights)
 		print("Superior One Bedroom -CHC- " + "£ "+ str(nprice1bed))
-		sheet.cell(row=thelast+1+i, column=4).value = nprice1bed
-		
+				
 	try:
-		chc2bed = results[1].html.find("span[id*='mbprice_'][id$='15071']", first=True).text
+		chc2bed = results[1].html.find("span[id='mbprice_6152281_15071_123']", first=True).text
 	except:
 		print("No availability -CHC- 2 Bedroom Apartment")
 	else:
@@ -136,8 +118,8 @@ for i in range(len(ascstart_url)):
 		nprice2bed=(float(price2bed_exvat))/1.2
 		nprice2bed=round(nprice2bed/chcnum_nights)	
 		print("2 Bedroom Apartment -CHC- " + "£ "+ str(nprice2bed))
-		sheet.cell(row=thelast+1+i, column=5).value = nprice2bed
-		
+
+
 	#arranging datas returned from Ashburn Court
 	try:
 		asc1bed = results[0].html.find("div.ProductsList div[data-room-code='A1F'] span[id*='PriceData']", first=True).text
@@ -147,7 +129,6 @@ for i in range(len(ascstart_url)):
 		ascPrice1bed_exvat=asc1bed.replace(",","")
 		ascPrice1bed=(float(ascPrice1bed_exvat))/1.2
 		ascPrice1bed=round(ascPrice1bed)
-		sheet.cell(row=thelast+1+i, column=6).value = ascPrice1bed
 		print("Deluxe 1 bedroom -ASC- £ " + str(ascPrice1bed))
 	try:
 		asc2bed = results[0].html.find("div.ProductsList div[data-room-code='2BD'] span[id*='PriceData']", first=True).text
@@ -157,7 +138,6 @@ for i in range(len(ascstart_url)):
 		ascPrice2bed_exvat=asc2bed.replace(",","")
 		ascPrice2bed=(float(ascPrice2bed_exvat))/1.2
 		ascPrice2bed=round(ascPrice2bed)
-		sheet.cell(row=thelast+1+i, column=7).value = ascPrice2bed
 		print("Deluxe 2 bedroom -ASC- £ " + str(ascPrice2bed))
 	try:
 		asc3bed = results[0].html.find("div.ProductsList div[data-room-code='3BD'] span[id*='PriceData']", first=True).text
@@ -167,27 +147,13 @@ for i in range(len(ascstart_url)):
 		ascPrice3bed_exvat=asc3bed.replace(",","")
 		ascPrice3bed=(float(ascPrice3bed_exvat))/1.2
 		ascPrice3bed=round(ascPrice3bed)
-		sheet.cell(row=thelast+1+i, column=8).value = ascPrice3bed
 		print("Deluxe 3 bedroom- ASC- £ " + str(ascPrice3bed))
-
-	try:
-		rghkingbed = results[2].html.find("div[id$='B1K0'] div[class$='price'] span", first=True).text
-		
-	except Exception as e:
-		print(e)
-		print("No availability -RGH- King Bed")
-	else:
-		# ascPrice1bed_exvat=asc1bed.replace(",","")
-		# ascPrice1bed=(float(ascPrice1bed_exvat))/1.2
-		# ascPrice1bed=round(ascPrice1bed)
-		# sheet.cell(row=thelast+1+i, column=6).value = ascPrice1bed
-		print(rghkingbed)
 
 
 	print("")
 	time.sleep(70)
 
-wb.save('multi.xlsx')
+
 
 
 
