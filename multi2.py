@@ -37,18 +37,18 @@ print("processing,,,\n")
 #these are for Ashburn Court Apartments 
 ascstart_date = start_date
 ascdep_date = end_Date_User
-ascstart_url=[]
+start_date_u=[]
 ascdep_url=[]
 num_nights = timedelta(days=10)
 numdays = timedelta(days=3)
 for i in range(365):
 	if ascstart_date >= end_Date_User:
-		ascstart_url.append(end_Date_User.strftime("%Y-%m-%d"))
+		start_date_u.append(end_Date_User.strftime("%Y-%m-%d"))
 		ascdep_date = end_Date_User + num_nights
 		ascdep_url.append(ascdep_date.strftime("%Y-%m-%d"))
 		break
 	else:
-		ascstart_url.append(ascstart_date.strftime("%Y-%m-%d"))
+		start_date_u.append(ascstart_date.strftime("%Y-%m-%d"))
 		ascdep_date = ascstart_date + num_nights
 		ascdep_url.append(ascdep_date.strftime("%Y-%m-%d"))
 		ascstart_date += numdays
@@ -69,10 +69,9 @@ chcnum_nights = 10
 #-------------
 
 
-
 #Requesting data from Cheval Harrington Court and Ashburn Court
-for i in range(len(ascstart_url)):
-	ascdate=ascstart_url[i]
+for i in range(len(start_date_u)):
+	ascdate=start_date_u[i]
 	ascdep_date = ascdep_url[i]	
 
 	asession = AsyncHTMLSession()
@@ -91,7 +90,7 @@ for i in range(len(ascstart_url)):
 		match = re.search("cheval", result.html.url)
 		if match:
 			try:
-				print("Date " + ascstart_url[i])
+				print("Date " + start_date_u[i])
 				chc1bed = result.html.find("#mbprice_6152281_15070_123", first=True).text
 				chc1bed = chc1bed.replace(",","")
 				chc1bed=(float(chc1bed))/1.2
