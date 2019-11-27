@@ -5,6 +5,7 @@ from requests_html import AsyncHTMLSession
 from matplotlib import pyplot as plt
 import csv
 
+
 #getting and validating input for start date and end date (should not exceed 1 year)
 max_date = timedelta(days=366)
 todayDate = datetime.now()
@@ -42,7 +43,7 @@ ascdep_date = end_Date_User
 start_date_u=[]
 ascdep_url=[]
 num_nights = timedelta(days=10)
-numdays = timedelta(days=3)
+numdays = timedelta(days=14)
 for i in range(365):
     if ascstart_date >= end_Date_User:
         start_date_u.append(end_Date_User.strftime("%Y-%m-%d"))
@@ -67,15 +68,14 @@ for i in range(365):
     else:
         chcstart_url.append(chcstart_date.strftime("%Y-%m-%d"))
         chcstart_date += numdays
-chcnum_nights = 10
+chcnum_nights = 2
 #-------------
 
-s_date_chc1bed, s_rate_chc1bed = [], []
-s_date_chc2bed, s_rate_chc2bed = [], []
+storage = ["Date","Chc1bed","Chc2bed","Ash1bed", "Ash2bed"]
 
-s_date_asc1bed, s_rate_asc1bed = [], []
-s_date_asc2bed, s_rate_asc2bed = [], []
-s_date_asc3bed, s_rate_asc3bed = [], []
+chevalFile = open('cheval.csv', 'w', newline='')
+chFile = csv.writer(chevalFile)
+chFile.writerow(storage)
 
 
 #Requesting data from Cheval Harrington Court and Ashburn Court
@@ -96,88 +96,107 @@ for i in range(len(start_date_u)):
     
     for result in results:
         match=re.search("cheval",result.html.url)
+        print("Date " + ascdate)
         
         if match:
             try:
-                print("Date " + ascdate)
-                s_date_chc1bed.append(ascdate)
+                storage = []
+                
+                discchc1bed = result.html.find("#mbprice_4539166_15070_123", first=True).text
                 chc1bed = result.html.find("#mbprice_6152281_15070_123", first=True).text
+                discchc2bed = result.html.find("#mbprice_4539166_15071_123", first=True).text
+                chc2bed = result.html.find("#mbprice_6152281_15071_123", first=True).text
+                
+                asc1bed = result.html.find("div.ProductsList div[data-room-code='A1F'] span[id*='PriceData']", first=True).text
+                asc2bed = result.html.find("div.ProductsList div[data-room-code='2BD'] span[id*='PriceData']", first=True).text
+                
+                if discchc1bed:
+                    chc1bed = discchc1bed
+                if discchc2bed:
+                    chc2bed = discchc2bed
+                
+                print("chc1bed " + chc1bed)
+                print("chc2bed " + chc2bed)
                 chc1bed = chc1bed.replace(",","")
                 chc1bed=(float(chc1bed))/1.2
                 chc1bed=round(chc1bed/chcnum_nights)
-                s_rate_chc1bed.append(chc1bed)
-                print("Superior One Bedroom -CHC- " + "£ "+ str(chc1bed))
-            except Exception as e:
-                print(e)
-                print("No data -CHC- Superior One Bedroom")
-            
-            try:
-                chc2bed = result.html.find("#mbprice_6152281_15071_123", first=True).text
-                s_date_chc2bed.append(ascdate)
-                chc2bed = chc2bed.replace(",","")
+                chc2bed = chc2bed.replace(",","")                
                 chc2bed=(float(chc2bed))/1.2
                 chc2bed=round(chc2bed/chcnum_nights)
-                s_rate_chc2bed.append(chc2bed)
-                print("2 Bedroom Apartment -CHC- " + "£ "+ str(chc2bed))
-            except Exception as e:
-                print(e)
-                print("No data -CHC- 2 Bedroom Apartment")
-        
-        else:
-            try:
-                asc1bed = result.html.find("div.ProductsList div[data-room-code='A1F'] span[id*='PriceData']", first=True).text
-            except:
-                print("No availability -ASC- Deluxe 1 Bed")
-            else:
+
+                print("ash1bed " + asc1bed)
+                print("ash2bed " + asc2bed)
                 ascPrice1bed_exvat=asc1bed.replace(",","")
                 ascPrice1bed=(float(ascPrice1bed_exvat))/1.2
                 ascPrice1bed=round(ascPrice1bed)
-                s_date_asc1bed.append(ascdate)
-                s_rate_asc1bed.append(ascPrice1bed)
-                print("Deluxe 1 bedroom -ASC- £ " + str(ascPrice1bed))
-            try:
-                asc2bed = result.html.find("div.ProductsList div[data-room-code='2BD'] span[id*='PriceData']", first=True).text
-            except:
-                print("No availability -ASC- Deluxe 2 Bed")
-            else:
-                ascPrice2bed_exvat=asc2bed.replace(",","")
-                ascPrice2bed=(float(ascPrice2bed_exvat))/1.2
-                ascPrice2bed=round(ascPrice2bed)
-                s_date_asc2bed.append(ascdate)
-                s_rate_asc2bed.append(ascPrice2bed)
-                print("Deluxe 2 bedroom -ASC- £ " + str(ascPrice2bed))
-            try:
-                asc3bed = result.html.find("div.ProductsList div[data-room-code='3BD'] span[id*='PriceData']", first=True).text
-            except:
-                print("No availability -ASC- Deluxe 3 Bed")
-            else:
-                ascPrice3bed_exvat=asc3bed.replace(",","")
-                ascPrice3bed=(float(ascPrice3bed_exvat))/1.2
-                ascPrice3bed=round(ascPrice3bed)
-                s_date_asc3bed.append(ascdate)
-                s_rate_asc3bed.append(ascPrice3bed)
-                print("Deluxe 3 bedroom- ASC- £ " + str(ascPrice3bed))
 
 
+
+                storage.append(ascdate)
+                storage.append(chc1bed)
+                storage.append(chc2bed)
+                chFile.writerow(storage)
+                            
+            except Exception as e:
+                print(e)
+                
+            
+        
+        # else:
+        #     try:
+        #         asc1bed = result.html.find("div.ProductsList div[data-room-code='A1F'] span[id*='PriceData']", first=True).text
+        #         ascPrice1bed_exvat=asc1bed.replace(",","")
+        #         ascPrice1bed=(float(ascPrice1bed_exvat))/1.2
+        #         ascPrice1bed=round(ascPrice1bed)
+        #         s_date_asc1bed.append(ascdate)
+        #         s_rate_asc1bed.append(ascPrice1bed)
+        #         print("Deluxe 1 bedroom -ASC- £ " + str(ascPrice1bed))
+        #     except Exception as e:
+        #         print(e)
+        #         print("No availability -ASC- Deluxe 1 Bed")
+                            
+        #     try:
+        #         asc2bed = result.html.find("div.ProductsList div[data-room-code='2BD'] span[id*='PriceData']", first=True).text
+        #         ascPrice2bed_exvat=asc2bed.replace(",","")
+        #         ascPrice2bed=(float(ascPrice2bed_exvat))/1.2
+        #         ascPrice2bed=round(ascPrice2bed)
+        #         s_date_asc2bed.append(ascdate)
+        #         s_rate_asc2bed.append(ascPrice2bed)
+        #         print("Deluxe 2 bedroom -ASC- £ " + str(ascPrice2bed))
+        #     except Exception as e:
+        #         print(e)
+        #         print("No availability -ASC- Deluxe 2 Bed")
+                           
+        #     try:
+        #         asc3bed = result.html.find("div.ProductsList div[data-room-code='3BD'] span[id*='PriceData']", first=True).text
+        #         ascPrice3bed_exvat=asc3bed.replace(",","")
+        #         ascPrice3bed=(float(ascPrice3bed_exvat))/1.2
+        #         ascPrice3bed=round(ascPrice3bed)
+        #         s_date_asc3bed.append(ascdate)
+        #         s_rate_asc3bed.append(ascPrice3bed)
+        #         print("Deluxe 3 bedroom- ASC- £ " + str(ascPrice3bed))
+        #     except Exception as e:
+        #         print(e)
+        #         print("No availability -ASC- Deluxe 3 Bed")
+   
         print("")
         time.sleep(70)
 
 
-csvFile = open('sample.csv', 'w', newline='')
-outFile = csv.writer(csvFile)
-outFile.writerow(s_date_chc1bed)
-outFile.writerow(s_rate_chc1bed)
-outFile.writerow(s_date_chc2bed)
-outFile.writerow(s_rate_chc2bed)
 
-outFile.writerow(s_date_asc1bed)
-outFile.writerow(s_rate_asc1bed)
-outFile.writerow(s_date_asc2bed)
-outFile.writerow(s_rate_asc2bed)
-outFile.writerow(s_date_asc3bed)
-outFile.writerow(s_rate_asc3bed)
 
-csvFile.close()
+
+chevalFile.close()
+
+# ashburnFile = open('ashburn.csv', 'w', newline='')
+# outFile = csv.writer(ashburnFile)
+# outFile.writerow(s_date_asc1bed)
+# outFile.writerow(s_rate_asc1bed)
+# outFile.writerow(s_date_asc2bed)
+# outFile.writerow(s_rate_asc2bed)
+# outFile.writerow(s_date_asc3bed)
+# outFile.writerow(s_rate_asc3bed)
+# ashburnFile.close()
 
 
 
