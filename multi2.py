@@ -5,6 +5,7 @@ from requests_html import AsyncHTMLSession
 from matplotlib import pyplot as plt
 import csv
 import myfunc
+import json
 
 
 #getting and validating input for start date and end date (should not exceed 1 year)
@@ -37,8 +38,7 @@ while True:
 print("processing,,,\n")
 #-----------------
 
-#Storing formatted date string in a list. Date requests will be every 14 days and length of stay is 10 nights
-#these are for Ashburn Court Apartments 
+
 ascstart_date = start_date
 ascdep_date = end_Date_User
 monstart_date = start_date.strftime("%Y-%m-%d")
@@ -46,8 +46,20 @@ monend_date = end_Date_User.strftime("%Y-%m-%d")
 print(monstart_date)
 print(monend_date)
 
-result = myfunc.get_monarch(monstart_date, monend_date)
+r = myfunc.get_monarch(monstart_date, monend_date).text
+results = json.loads(r)
 
-for x in result:
-    for y in x:
-        print(["room_types"])
+disp = results[0]['room_types']
+
+for x in range(len(disp)):
+    if 'One Bedroom Apartment' in disp[x].values():
+        for y in disp[x]['room_type_dates']:
+            print(y['rate'])
+
+
+    # if 'One Bedroom Apartment' in a.values():
+    #     for y in disp[x]['room_type_dates']:
+    #         print(disp[x]['room_type_dates'][y]['date'])
+
+
+
