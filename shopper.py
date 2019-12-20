@@ -62,7 +62,7 @@ for i in range(365):
         ascstart_date += numdays
 #------------
 
-#Storing formatted date string in a list. Date requests will be every 14 days and length of stay are 2 nights
+#Storing formatted date string in a list. Date requests will be every 14 days and length of stay are 21 nights
 #these are for Cheval Harrington Court 
 chcstart_date =  start_date
 chcstart_url=[]
@@ -73,7 +73,7 @@ for i in range(365):
     else:
         chcstart_url.append(chcstart_date.strftime("%Y-%m-%d"))
         chcstart_date += numdays
-chcnum_nights = 2
+chcnum_nights = 21
 #-------------
 
 storage_che = ["Date", "Chc1bed", "Chc2bed"]
@@ -205,5 +205,6 @@ for i in range(len(start_date_u)):
 
 chevalFile.close()
 ashburnFile.close()
+myfunc.run_plot()
 
 input("press any key to terminate,,,")
