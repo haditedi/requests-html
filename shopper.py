@@ -100,12 +100,13 @@ for i in range(len(start_date_u)):
         return r
     
     async def getchc():
-        r = await asession.get(f"https://secure.chevalresidences.com/convert/site/Cheval%20Harrington%20Court[wsJsZoGCLg62hr_WrMSMy9dIwRklPItcNUhU30wAXMo]/en/results.php?checkin={chcstart_url[i]}&nights={chcnum_nights}&currency=GBP&resultViewType=mda&viewtype=rateroom&partya=0")
+        r = await asession.get(f"https://secure.chevalcollection.com/convert/site/Cheval%20Harrington%20Court[wsJsZoGCLg62hr_WrMSMy9dIwRklPItcNUhU30wAXMo]/en/results.php?checkin={chcstart_url[i]}&nights={chcnum_nights}&currency=GBP&resultViewType=sda&viewtype=rateroom&partya=0")
         return r
         
     results = asession.run(getasc, getchc)
-    
+        
     for result in results:
+        print(result)
         match=re.search("cheval",result.html.url)
         
         print("Date " + ascdate)
