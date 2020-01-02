@@ -99,9 +99,11 @@ storage_che = []
 
 for i in range(len(start_date_u)):
     ascdate=start_date_u[i]
+    store_date=ascdate.split('-')
+    store_date=store_date[2] + '-' + store_date[1]
     ascdep_date = ascdep_url[i]
     asession = AsyncHTMLSession()
-
+    
     async def getasc():
         r = await asession.get(f"https://booking.maykenbel.com/?chain=19159&template=maykenbel&shell=MKNBL2018&start=availresults&brand=maykenbe&currency=GBP&lang=1&arrive={ascdate[5:7]}%2F{ascdate[8:10]}%2F{ascdate[:4]}&depart={ascdep_date[5:7]}%2F{ascdep_date[8:10]}%2F{ascdep_date[:4]}&hotel=70825&dpArrive={ascdate[8:10]}%2F{ascdate[5:7]}%2F{ascdate[:4]}&dpDepart={ascdep_date[8:10]}%2F{ascdep_date[5:7]}%2F{ascdep_date[:4]}&rooms=1&adult=1&promo=")
         return r
@@ -175,8 +177,8 @@ for i in range(len(start_date_u)):
                         print(e)
                         print("no data chc2bed 21nights") 
 
-            if storage_che:
-                storage_che.insert(0, ascdate)
+            if storage_che:                
+                storage_che.insert(0, store_date)
                 print(storage_che)
                 cheFile.writerow(storage_che)
             storage_che = []
@@ -219,7 +221,7 @@ for i in range(len(start_date_u)):
         #         print("No data -ASC- Deluxe 3 Bed")
 
         #     if storage_ash:
-        #         storage_ash.insert(0, ascdate)
+        #         storage_ash.insert(0, store_date)
         #         print(storage_ash)
         #     ashFile.writerow(storage_ash)
         #     storage_ash = []
@@ -231,6 +233,6 @@ for i in range(len(start_date_u)):
 
 chevalFile.close()
 # ashburnFile.close()
-myfunc.run_plot()
+# myfunc.run_plot()
 
 input("press any key to terminate,,,")
