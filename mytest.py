@@ -84,16 +84,16 @@ for i in range(365):
 
 
 storage_che = ["Date", "Chc1bed", "Chc2bed"]
-chevalFile = open('cheval.csv', 'w', newline='')
+chevalFile = open('./data/cheval.csv', 'w', newline='')
 cheFile = csv.writer(chevalFile)
 cheFile.writerow(storage_che)
 storage_che = []
 
-# storage_ash = ["Date", "Ash1bed", "Ash2bed", "Ash3bed"]
-# ashburnFile = open('ashburn.csv', 'w', newline='')
-# ashFile = csv.writer(ashburnFile)
-# ashFile.writerow(storage_ash)
-# storage_ash = []
+storage_ash = ["Date", "Ash1bed", "Ash2bed", "Ash3bed"]
+ashburnFile = open('./data/ashburn.csv', 'w', newline='')
+ashFile = csv.writer(ashburnFile)
+ashFile.writerow(storage_ash)
+storage_ash = []
 
 
 
@@ -184,47 +184,47 @@ for i in range(len(start_date_u)):
             storage_che = []
        
               
-        # else:
+        else:
      
-        #     print("Ashburn Court")
-        #     try:
-        #         asc1bed = result.html.find("div.ProductsList div[data-room-code='A1F'] span[id*='PriceData']", first=True).text
-        #         ascPrice1bed_exvat=asc1bed.replace(",","")
-        #         ascPrice1bed=(float(ascPrice1bed_exvat))/1.2
-        #         ascPrice1bed=round(ascPrice1bed)
-        #         storage_ash.insert(1, ascPrice1bed)
-        #         print("Deluxe 1 bedroom -ASC- £ " + str(ascPrice1bed))
-        #     except Exception as e:
-        #         print(e)
-        #         print("No data -ASC- Deluxe 1 Bed")
+            print("Ashburn Court")
+            try:
+                asc1bed = result.html.find("div.ProductsList div[data-room-code='A1F'] span[id*='PriceData']", first=True).text
+                ascPrice1bed_exvat=asc1bed.replace(",","")
+                ascPrice1bed=(float(ascPrice1bed_exvat))/1.2
+                ascPrice1bed=round(ascPrice1bed)
+                storage_ash.insert(1, ascPrice1bed)
+                print("Deluxe 1 bedroom -ASC- £ " + str(ascPrice1bed))
+            except Exception as e:
+                print(e)
+                print("No data -ASC- Deluxe 1 Bed")
           
-        #     try:
-        #         asc2bed = result.html.find("div.ProductsList div[data-room-code='2BD'] span[id*='PriceData']", first=True).text
-        #         ascPrice2bed_exvat=asc2bed.replace(",","")
-        #         ascPrice2bed=(float(ascPrice2bed_exvat))/1.2
-        #         ascPrice2bed=round(ascPrice2bed)
-        #         storage_ash.insert(2, ascPrice2bed)
-        #         print("Deluxe 2 bedroom -ASC- £ " + str(ascPrice2bed))
-        #     except Exception as e:
-        #         print(e)
-        #         print("No data -ASC- Deluxe 2 Bed")
+            try:
+                asc2bed = result.html.find("div.ProductsList div[data-room-code='2BD'] span[id*='PriceData']", first=True).text
+                ascPrice2bed_exvat=asc2bed.replace(",","")
+                ascPrice2bed=(float(ascPrice2bed_exvat))/1.2
+                ascPrice2bed=round(ascPrice2bed)
+                storage_ash.insert(2, ascPrice2bed)
+                print("Deluxe 2 bedroom -ASC- £ " + str(ascPrice2bed))
+            except Exception as e:
+                print(e)
+                print("No data -ASC- Deluxe 2 Bed")
 
-        #     try:
-        #         asc3bed = result.html.find("div.ProductsList div[data-room-code='3BD'] span[id*='PriceData']", first=True).text
-        #         ascPrice3bed_exvat=asc3bed.replace(",","")
-        #         ascPrice3bed=(float(ascPrice3bed_exvat))/1.2
-        #         ascPrice3bed=round(ascPrice3bed)
-        #         storage_ash.insert(3, ascPrice3bed)
-        #         print("Deluxe 3 bedroom- ASC- £ " + str(ascPrice3bed))
-        #     except Exception as e:
-        #         print(e)
-        #         print("No data -ASC- Deluxe 3 Bed")
+            try:
+                asc3bed = result.html.find("div.ProductsList div[data-room-code='3BD'] span[id*='PriceData']", first=True).text
+                ascPrice3bed_exvat=asc3bed.replace(",","")
+                ascPrice3bed=(float(ascPrice3bed_exvat))/1.2
+                ascPrice3bed=round(ascPrice3bed)
+                storage_ash.insert(3, ascPrice3bed)
+                print("Deluxe 3 bedroom- ASC- £ " + str(ascPrice3bed))
+            except Exception as e:
+                print(e)
+                print("No data -ASC- Deluxe 3 Bed")
 
-        #     if storage_ash:
-        #         storage_ash.insert(0, store_date)
-        #         print(storage_ash)
-        #     ashFile.writerow(storage_ash)
-        #     storage_ash = []
+            if storage_ash:
+                storage_ash.insert(0, store_date)
+                print(storage_ash)
+                ashFile.writerow(storage_ash)
+            storage_ash = []
 
    
         print("")
@@ -232,7 +232,7 @@ for i in range(len(start_date_u)):
 
 
 chevalFile.close()
-# ashburnFile.close()
-# myfunc.run_plot()
+ashburnFile.close()
+# myfunc.run_plot1()
 
 input("press any key to terminate,,,")

@@ -1,10 +1,8 @@
-import time
 import re
 from datetime import datetime, timedelta
 from requests_html import AsyncHTMLSession
-from matplotlib import pyplot as plt
-import csv
 import myfunc
+import csv
 import json
 
 
@@ -24,7 +22,7 @@ while True:
         print(e)
 
 
-end_Date_User = start_date+timedelta(days=27)
+end_Date_User = start_date
 
 print("processing,,,\n")
 
@@ -47,7 +45,7 @@ mons3File = csv.writer(monarchs3File)
 mons3File.writerow(storage_mon)
 storage_mon = []
 
-for i in range(9):  
+for i in range(18):  
     monstart_date = start_date.strftime("%Y-%m-%d")
     monend_date = end_Date_User.strftime("%Y-%m-%d")   
 
@@ -101,8 +99,8 @@ for i in range(9):
                     mons3File.writerow(storage_mon)
                     storage_mon = []                
                     print(loop_room[y]['date'] + ' ' + str(rates3bed))    
-    start_date += timedelta(days=28)
-    end_Date_User += timedelta(days=28)  
+    start_date += timedelta(days=14)
+    end_Date_User = start_date 
 
 monarch1File.close()
 monarch2File.close()
