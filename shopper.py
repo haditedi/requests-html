@@ -1,7 +1,7 @@
 import time
 import re
-from datetime import datetime, timedelta
 from requests_html import AsyncHTMLSession
+from datetime import datetime, timedelta
 from matplotlib import pyplot as plt
 import csv
 import myfunc
@@ -66,32 +66,41 @@ for i in range(365):
 #these are for Cheval Harrington Court 
 chcstart_date =  start_date
 chcstart_url=[]
+chc_nights = []
+chcnum_nights = 5
 for i in range(365):
+    if chcstart_date.month > 6:
+        chcnum_nights = 21
     if chcstart_date >= end_Date_User:
         chcstart_url.append(end_Date_User.strftime("%Y-%m-%d"))
+        chc_nights.append(chcnum_nights)        
         break
     else:
         chcstart_url.append(chcstart_date.strftime("%Y-%m-%d"))
         chcstart_date += numdays
-chcnum_nights = 21
-#-------------
+        chc_nights.append(chcnum_nights)
+    
+        
+
 
 storage_che = ["Date", "Chc1bed", "Chc2bed"]
-chevalFile = open('cheval.csv', 'w', newline='')
+chevalFile = open('./data/chevaladd.csv', 'w', newline='')
 cheFile = csv.writer(chevalFile)
 cheFile.writerow(storage_che)
 storage_che = []
 
 storage_ash = ["Date", "Ash1bed", "Ash2bed", "Ash3bed"]
-ashburnFile = open('ashburn.csv', 'w', newline='')
+ashburnFile = open('./data/ashburnadd.csv', 'w', newline='')
 ashFile = csv.writer(ashburnFile)
 ashFile.writerow(storage_ash)
 storage_ash = []
 
 
-#Requesting data from Cheval Harrington Court and Ashburn Court
+
 for i in range(len(start_date_u)):
     ascdate=start_date_u[i]
+    store_date=ascdate.split('-')
+    store_date=store_date[2] + '-' + store_date[1]
     ascdep_date = ascdep_url[i]
     asession = AsyncHTMLSession()
     
@@ -100,11 +109,11 @@ for i in range(len(start_date_u)):
         return r
     
     async def getchc():
-        r = await asession.get(f"https://secure.chevalcollection.com/convert/site/Cheval%20Harrington%20Court[wsJsZoGCLg62hr_WrMSMy9dIwRklPItcNUhU30wAXMo]/en/results.php?checkin={chcstart_url[i]}&nights={chcnum_nights}&currency=GBP&resultViewType=sda&viewtype=rateroom&partya=0")
+        r = await asession.get(f"https://secure.chevalcollection.com/convert/site/Cheval%20Harrington%20Court[wsJsZoGCLg62hr_WrMSMy9dIwRklPItcNUhU30wAXMo]/en/results.php?checkin={chcstart_url[i]}&nights={chc_nights[i]}&currency=GBP&resultViewType=sda&viewtype=rateroom&partya=0")
         return r
         
     results = asession.run(getasc, getchc)
-        
+    
     for result in results:
         print(result)
         match=re.search("cheval",result.html.url)
@@ -115,9 +124,9 @@ for i in range(len(start_date_u)):
 
             print("Cheval Harrington Court")       
             try:
-                discchc1bed = result.html.find("#mbprice_4539166_15070_123", first=True).text
+                discchc1bed = result.html.find("#mbprice_4932506_15069_123", first=True).text
                 if discchc1bed:
-                    chc1bed = myfunc.chc_calc(discchc1bed, chcnum_nights)
+                    chc1bed = myfunc.chc_calc(discchc1bed, chc_nights[i])
                     storage_che.insert(1, chc1bed)
                     print("discount 1 bed " + str(chc1bed))
             except Exception as e:
@@ -125,17 +134,27 @@ for i in range(len(start_date_u)):
                 print("no data discchc1bed")
                 try:
                     chc1bed = result.html.find("#mbprice_6152281_15070_123", first=True).text
-                    chc1bed = myfunc.chc_calc(chc1bed, chcnum_nights)
+                    chc1bed = myfunc.chc_calc(chc1bed, chc_nights[i])
                     storage_che.insert(1, chc1bed)
                     print('advance 1 bed ' + str(chc1bed))             
                 except Exception as e:
                     print(e)         
-                    print("no data chc1bed")
+                    print("no data chc1bed")         
+                    try:
+                        chc1bed = result.html.find("#mbprice_6152281_15069_123", first=True).text
+                        chc1bed = myfunc.chc_calc(chc1bed, chc_nights[i])
+                        storage_che.insert(1, chc1bed)
+                        print('advance 1 bed 21 nights ' + str(chc1bed))             
+                    except Exception as e:
+                        print(e)         
+                        print("no data chc1bed 21 nights")
+            
+
             try:
-                discchc2bed = result.html.find("#mbprice_4539166_15071_123", first=True).text
+                discchc2bed = result.html.find("#mbprice_4932506_15071_123", first=True).text
                 if discchc2bed:
                     chc2bed = discchc2bed
-                    chc2bed = myfunc.chc_calc(chc2bed, chcnum_nights)
+                    chc2bed = myfunc.chc_calc(chc2bed, chc_nights[i])
                     storage_che.insert(2, chc2bed)
                     print("discount 2 bed " + str(chc2bed))
             except Exception as e:
@@ -143,15 +162,23 @@ for i in range(len(start_date_u)):
                 print("no data discchc2bed")
                 try:
                     chc2bed = result.html.find("#mbprice_6152281_15071_123", first=True).text
-                    chc2bed = myfunc.chc_calc(chc2bed, chcnum_nights)
+                    chc2bed = myfunc.chc_calc(chc2bed, chc_nights[i])
                     storage_che.insert(2, chc2bed)
                     print('advance rate 2 bed ' + str(chc2bed))
                 except Exception as e:
                     print(e)
-                    print("no data chc2bed") 
-            
-            if storage_che:
-                storage_che.insert(0, ascdate)
+                    print("no data chc2bed")            
+                    try:
+                        chc2bed = result.html.find("#mbprice_6152281_15071_123", first=True).text
+                        chc2bed = myfunc.chc_calc(chc2bed, chc_nights[i])
+                        storage_che.insert(2, chc2bed)
+                        print('advance rate 2 bed 21 nights ' + str(chc2bed))
+                    except Exception as e:
+                        print(e)
+                        print("no data chc2bed 21nights") 
+
+            if storage_che:                
+                storage_che.insert(0, store_date)
                 print(storage_che)
                 cheFile.writerow(storage_che)
             storage_che = []
@@ -194,9 +221,9 @@ for i in range(len(start_date_u)):
                 print("No data -ASC- Deluxe 3 Bed")
 
             if storage_ash:
-                storage_ash.insert(0, ascdate)
+                storage_ash.insert(0, store_date)
                 print(storage_ash)
-            ashFile.writerow(storage_ash)
+                ashFile.writerow(storage_ash)
             storage_ash = []
 
    
@@ -206,6 +233,6 @@ for i in range(len(start_date_u)):
 
 chevalFile.close()
 ashburnFile.close()
-myfunc.run_plot()
+# myfunc.run_plot1()
 
 input("press any key to terminate,,,")

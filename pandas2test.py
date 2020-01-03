@@ -28,7 +28,7 @@ def run_plot1():
     plt.xlabel("Date")
     plt.ylabel("Rate")
     plt.style.use("fivethirtyeight")
-    plt.title("Two Bed Comparison")
+    plt.title("Two Bed Rate Comparison")
     plt.legend()
     dm_fmt = mdates.DateFormatter('%d-%m')
     ax.xaxis.set_major_formatter(dm_fmt)
