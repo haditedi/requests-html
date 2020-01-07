@@ -78,22 +78,32 @@ for i in range(365):
     else:
         chcstart_url.append(chcstart_date.strftime("%Y-%m-%d"))
         chcstart_date += numdays
-        chc_nights.append(chcnum_nights)
-    
-        
+        chc_nights.append(chcnum_nights)        
 
 
-storage_che = ["Date", "Chc1bed", "Chc2bed"]
-chevalFile = open('./data/chevaladd.csv', 'w', newline='')
-cheFile = csv.writer(chevalFile)
-cheFile.writerow(storage_che)
-storage_che = []
+storage_che = ["Date", "Chc1bed"]
+cheval1File = open('./data/cheval1bed.csv', 'a', newline='')
+che1File = csv.writer(cheval1File)
+che1File.writerow(storage_che)
+storage_1che = []
 
-storage_ash = ["Date", "Ash1bed", "Ash2bed", "Ash3bed"]
-ashburnFile = open('./data/ashburnadd.csv', 'w', newline='')
-ashFile = csv.writer(ashburnFile)
-ashFile.writerow(storage_ash)
-storage_ash = []
+storage_che = ["Date", "Chc2bed"]
+cheval2File = open('./data/cheval2bed.csv', 'a', newline='')
+che2File = csv.writer(cheval2File)
+che2File.writerow(storage_che)
+storage_2che = []
+
+storage_ash = ["Date", "Ash1bed"]
+ashburn1File = open('./data/ashburn1bed.csv', 'a', newline='')
+ash1File = csv.writer(ashburn1File)
+ash1File.writerow(storage_ash)
+storage_1ash = []
+
+storage_ash = ["Date", "Ash2bed"]
+ashburn2File = open('./data/ashburn2bed.csv', 'a', newline='')
+ash2File = csv.writer(ashburn2File)
+ash2File.writerow(storage_ash)
+storage_2ash = []
 
 
 
@@ -127,7 +137,7 @@ for i in range(len(start_date_u)):
                 discchc1bed = result.html.find("#mbprice_4932506_15069_123", first=True).text
                 if discchc1bed:
                     chc1bed = myfunc.chc_calc(discchc1bed, chc_nights[i])
-                    storage_che.insert(1, chc1bed)
+                    storage_1che.insert(1, chc1bed)
                     print("discount 1 bed " + str(chc1bed))
             except Exception as e:
                 print(e)
@@ -135,7 +145,7 @@ for i in range(len(start_date_u)):
                 try:
                     chc1bed = result.html.find("#mbprice_6152281_15070_123", first=True).text
                     chc1bed = myfunc.chc_calc(chc1bed, chc_nights[i])
-                    storage_che.insert(1, chc1bed)
+                    storage_1che.insert(1, chc1bed)
                     print('advance 1 bed ' + str(chc1bed))             
                 except Exception as e:
                     print(e)         
@@ -143,7 +153,7 @@ for i in range(len(start_date_u)):
                     try:
                         chc1bed = result.html.find("#mbprice_6152281_15069_123", first=True).text
                         chc1bed = myfunc.chc_calc(chc1bed, chc_nights[i])
-                        storage_che.insert(1, chc1bed)
+                        storage_1che.insert(1, chc1bed)
                         print('advance 1 bed 21 nights ' + str(chc1bed))             
                     except Exception as e:
                         print(e)         
@@ -155,7 +165,7 @@ for i in range(len(start_date_u)):
                 if discchc2bed:
                     chc2bed = discchc2bed
                     chc2bed = myfunc.chc_calc(chc2bed, chc_nights[i])
-                    storage_che.insert(2, chc2bed)
+                    storage_2che.insert(2, chc2bed)
                     print("discount 2 bed " + str(chc2bed))
             except Exception as e:
                 print(e)
@@ -163,7 +173,7 @@ for i in range(len(start_date_u)):
                 try:
                     chc2bed = result.html.find("#mbprice_6152281_15071_123", first=True).text
                     chc2bed = myfunc.chc_calc(chc2bed, chc_nights[i])
-                    storage_che.insert(2, chc2bed)
+                    storage_2che.insert(2, chc2bed)
                     print('advance rate 2 bed ' + str(chc2bed))
                 except Exception as e:
                     print(e)
@@ -171,17 +181,22 @@ for i in range(len(start_date_u)):
                     try:
                         chc2bed = result.html.find("#mbprice_6152281_15071_123", first=True).text
                         chc2bed = myfunc.chc_calc(chc2bed, chc_nights[i])
-                        storage_che.insert(2, chc2bed)
+                        storage_2che.insert(2, chc2bed)
                         print('advance rate 2 bed 21 nights ' + str(chc2bed))
                     except Exception as e:
                         print(e)
                         print("no data chc2bed 21nights") 
 
-            if storage_che:                
-                storage_che.insert(0, store_date)
-                print(storage_che)
-                cheFile.writerow(storage_che)
-            storage_che = []
+            if storage_1che:                
+                storage_1che.insert(0, store_date)
+                print(storage_1che)
+                che1File.writerow(storage_1che)
+            storage_1che = []
+            if storage_2che:                
+                storage_2che.insert(0, store_date)
+                print(storage_2che)
+                che2File.writerow(storage_2che)
+            storage_2che = []
        
               
         else:
@@ -192,7 +207,7 @@ for i in range(len(start_date_u)):
                 ascPrice1bed_exvat=asc1bed.replace(",","")
                 ascPrice1bed=(float(ascPrice1bed_exvat))/1.2
                 ascPrice1bed=round(ascPrice1bed)
-                storage_ash.insert(1, ascPrice1bed)
+                storage_1ash.insert(1, ascPrice1bed)
                 print("Deluxe 1 bedroom -ASC- £ " + str(ascPrice1bed))
             except Exception as e:
                 print(e)
@@ -203,36 +218,43 @@ for i in range(len(start_date_u)):
                 ascPrice2bed_exvat=asc2bed.replace(",","")
                 ascPrice2bed=(float(ascPrice2bed_exvat))/1.2
                 ascPrice2bed=round(ascPrice2bed)
-                storage_ash.insert(2, ascPrice2bed)
+                storage_2ash.insert(2, ascPrice2bed)
                 print("Deluxe 2 bedroom -ASC- £ " + str(ascPrice2bed))
             except Exception as e:
                 print(e)
                 print("No data -ASC- Deluxe 2 Bed")
 
-            try:
-                asc3bed = result.html.find("div.ProductsList div[data-room-code='3BD'] span[id*='PriceData']", first=True).text
-                ascPrice3bed_exvat=asc3bed.replace(",","")
-                ascPrice3bed=(float(ascPrice3bed_exvat))/1.2
-                ascPrice3bed=round(ascPrice3bed)
-                storage_ash.insert(3, ascPrice3bed)
-                print("Deluxe 3 bedroom- ASC- £ " + str(ascPrice3bed))
-            except Exception as e:
-                print(e)
-                print("No data -ASC- Deluxe 3 Bed")
+            # try:
+            #     asc3bed = result.html.find("div.ProductsList div[data-room-code='3BD'] span[id*='PriceData']", first=True).text
+            #     ascPrice3bed_exvat=asc3bed.replace(",","")
+            #     ascPrice3bed=(float(ascPrice3bed_exvat))/1.2
+            #     ascPrice3bed=round(ascPrice3bed)
+            #     storage_ash.insert(3, ascPrice3bed)
+            #     print("Deluxe 3 bedroom- ASC- £ " + str(ascPrice3bed))
+            # except Exception as e:
+            #     print(e)
+            #     print("No data -ASC- Deluxe 3 Bed")
 
-            if storage_ash:
-                storage_ash.insert(0, store_date)
-                print(storage_ash)
-                ashFile.writerow(storage_ash)
-            storage_ash = []
+            if storage_1ash:
+                storage_1ash.insert(0, store_date)
+                print(storage_1ash)
+                ash1File.writerow(storage_1ash)
+            storage_1ash = []
+            if storage_2ash:
+                storage_2ash.insert(0, store_date)
+                print(storage_2ash)
+                ash2File.writerow(storage_2ash)
+            storage_2ash = []
 
    
         print("")
         time.sleep(70)
 
 
-chevalFile.close()
-ashburnFile.close()
+cheval1File.close()
+cheval2File.close()
+ashburn1File.close()
+ashburn2File.close()
 # myfunc.run_plot1()
 
 input("press any key to terminate,,,")

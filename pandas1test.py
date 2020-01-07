@@ -4,8 +4,8 @@ from pandas.plotting import register_matplotlib_converters
 import matplotlib.dates as mdates
 
 def run_plot1():
-    df_ash = pd.read_csv('./data/ashburn.csv')
-    df_che = pd.read_csv('./data/cheval.csv')
+    df_ash = pd.read_csv('./data/ashburn1bed.csv')
+    df_che = pd.read_csv('./data/cheval1bed.csv')
     df_mon = pd.read_csv('./data/monarch1bed.csv')
     
     df_ash.Date = pd.to_datetime(df_ash.Date, format='%d-%m')
@@ -19,7 +19,7 @@ def run_plot1():
     ax.plot(df_mon['Date'], df_mon['Mon1bed'], label='Monarch 1 bed')
     ax.plot(df_che['Date'], df_che['Chc1bed'], label='Cheval 1 bed')
     plt.xlabel("Date")
-    plt.ylabel("Rate")
+    plt.ylabel("Rate (£) - exclude vat")
     plt.style.use("fivethirtyeight")
     plt.title("One Bed Rate Comparison")
     plt.legend()
