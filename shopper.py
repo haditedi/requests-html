@@ -4,7 +4,7 @@ from requests_html import AsyncHTMLSession
 from datetime import datetime, timedelta
 from matplotlib import pyplot as plt
 import csv
-import myfunc
+from myfunc import run_mon, get_monarch, chc_calc, run_plot1bed, run_plot2bed
 
 
 #getting and validating input for start date and end date (should not exceed 1 year)
@@ -37,14 +37,19 @@ while True:
 print("processing,,,\n")
 #-----------------
 
+
+#getting data from Monarch House api
+run_mon(start_date, end_Date_User)
+
+
 #Storing formatted date string in a list. Date requests will be every 14 days and length of stay is 10 nights
 #these are for Ashburn Court Apartments 
 ascstart_date = start_date
 ascdep_date = end_Date_User
 monstart_date = start_date.strftime("%d-%m-%Y")
 monend_date = end_Date_User.strftime("%d-%m-%Y")
-print(monstart_date)
-print(monend_date)
+print("start date: " + monstart_date)
+print("end date: " + monend_date)
 start_date_u=[]
 ascdep_url=[]
 num_nights = timedelta(days=10)
@@ -62,7 +67,8 @@ for i in range(365):
         ascstart_date += numdays
 #------------
 
-#Storing formatted date string in a list. Date requests will be every 14 days and length of stay are 21 nights
+
+#Storing formatted date string in a list. Date requests will be every 14 days and length of stay are 5 nights except for June onward is 21 nights min stay
 #these are for Cheval Harrington Court 
 chcstart_date =  start_date
 chcstart_url=[]
@@ -82,29 +88,28 @@ for i in range(365):
 
 
 storage_che = ["Date", "Chc1bed"]
-cheval1File = open('./data/cheval1bed.csv', 'a', newline='')
+cheval1File = open('./data/cheval1bed.csv', 'w', newline='')
 che1File = csv.writer(cheval1File)
 che1File.writerow(storage_che)
 storage_1che = []
 
 storage_che = ["Date", "Chc2bed"]
-cheval2File = open('./data/cheval2bed.csv', 'a', newline='')
+cheval2File = open('./data/cheval2bed.csv', 'w', newline='')
 che2File = csv.writer(cheval2File)
 che2File.writerow(storage_che)
 storage_2che = []
 
 storage_ash = ["Date", "Ash1bed"]
-ashburn1File = open('./data/ashburn1bed.csv', 'a', newline='')
+ashburn1File = open('./data/ashburn1bed.csv', 'w', newline='')
 ash1File = csv.writer(ashburn1File)
 ash1File.writerow(storage_ash)
 storage_1ash = []
 
 storage_ash = ["Date", "Ash2bed"]
-ashburn2File = open('./data/ashburn2bed.csv', 'a', newline='')
+ashburn2File = open('./data/ashburn2bed.csv', 'w', newline='')
 ash2File = csv.writer(ashburn2File)
 ash2File.writerow(storage_ash)
 storage_2ash = []
-
 
 
 for i in range(len(start_date_u)):
@@ -136,7 +141,7 @@ for i in range(len(start_date_u)):
             try:
                 discchc1bed = result.html.find("#mbprice_4932506_15069_123", first=True).text
                 if discchc1bed:
-                    chc1bed = myfunc.chc_calc(discchc1bed, chc_nights[i])
+                    chc1bed = chc_calc(discchc1bed, chc_nights[i])
                     storage_1che.insert(1, chc1bed)
                     print("discount 1 bed " + str(chc1bed))
             except Exception as e:
@@ -144,7 +149,7 @@ for i in range(len(start_date_u)):
                 print("no data discchc1bed")
                 try:
                     chc1bed = result.html.find("#mbprice_6152281_15070_123", first=True).text
-                    chc1bed = myfunc.chc_calc(chc1bed, chc_nights[i])
+                    chc1bed = chc_calc(chc1bed, chc_nights[i])
                     storage_1che.insert(1, chc1bed)
                     print('advance 1 bed ' + str(chc1bed))             
                 except Exception as e:
@@ -152,7 +157,7 @@ for i in range(len(start_date_u)):
                     print("no data chc1bed")         
                     try:
                         chc1bed = result.html.find("#mbprice_6152281_15069_123", first=True).text
-                        chc1bed = myfunc.chc_calc(chc1bed, chc_nights[i])
+                        chc1bed = chc_calc(chc1bed, chc_nights[i])
                         storage_1che.insert(1, chc1bed)
                         print('advance 1 bed 21 nights ' + str(chc1bed))             
                     except Exception as e:
@@ -164,7 +169,7 @@ for i in range(len(start_date_u)):
                 discchc2bed = result.html.find("#mbprice_4932506_15071_123", first=True).text
                 if discchc2bed:
                     chc2bed = discchc2bed
-                    chc2bed = myfunc.chc_calc(chc2bed, chc_nights[i])
+                    chc2bed = chc_calc(chc2bed, chc_nights[i])
                     storage_2che.insert(2, chc2bed)
                     print("discount 2 bed " + str(chc2bed))
             except Exception as e:
@@ -172,7 +177,7 @@ for i in range(len(start_date_u)):
                 print("no data discchc2bed")
                 try:
                     chc2bed = result.html.find("#mbprice_6152281_15071_123", first=True).text
-                    chc2bed = myfunc.chc_calc(chc2bed, chc_nights[i])
+                    chc2bed = chc_calc(chc2bed, chc_nights[i])
                     storage_2che.insert(2, chc2bed)
                     print('advance rate 2 bed ' + str(chc2bed))
                 except Exception as e:
@@ -180,7 +185,7 @@ for i in range(len(start_date_u)):
                     print("no data chc2bed")            
                     try:
                         chc2bed = result.html.find("#mbprice_6152281_15071_123", first=True).text
-                        chc2bed = myfunc.chc_calc(chc2bed, chc_nights[i])
+                        chc2bed = chc_calc(chc2bed, chc_nights[i])
                         storage_2che.insert(2, chc2bed)
                         print('advance rate 2 bed 21 nights ' + str(chc2bed))
                     except Exception as e:
@@ -248,6 +253,7 @@ for i in range(len(start_date_u)):
 
    
         print("")
+        print("processing ,,,")
         time.sleep(70)
 
 
@@ -255,6 +261,11 @@ cheval1File.close()
 cheval2File.close()
 ashburn1File.close()
 ashburn2File.close()
-# myfunc.run_plot1()
+
+time.sleep(10)
+
+#plotting charts
+run_plot1bed()
+run_plot2bed()
 
 input("press any key to terminate,,,")
